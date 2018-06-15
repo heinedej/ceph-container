@@ -21,6 +21,7 @@ spec:
         app: ceph
         daemon: mgr
     spec:
+      hostNetwork: true
       serviceAccount: default
       tolerations:
         - key: CriticalAddonsOnly
@@ -40,25 +41,31 @@ spec:
                 values: ["mgr"]
             topologyKey: kubernetes.io/hostname
       volumes:
-        - name: ceph-conf
-          secret:
-            secretName: ceph-conf-combined
-        - name: ceph-bootstrap-osd-keyring
-          secret:
-            secretName: ceph-bootstrap-osd-keyring
-        - name: ceph-bootstrap-mds-keyring
-          secret:
-            secretName: ceph-bootstrap-mds-keyring
-        - name: ceph-bootstrap-rgw-keyring
-          secret:
-            secretName: ceph-bootstrap-rgw-keyring
-        - name: ceph-bootstrap-rbd-keyring
-          secret:
-            secretName: ceph-bootstrap-rbd-keyring
+        - name: etc-ceph
+          persistentVolumeClaim:
+            claimName: etc-ceph
+        - name: var-lib-ceph
+          persistentVolumeClaim:
+            claimName: var-lib-ceph
+#        - name: ceph-conf
+#          secret:
+#            secretName: ceph-conf-combined
+#        - name: ceph-bootstrap-osd-keyring
+#          secret:
+#            secretName: ceph-bootstrap-osd-keyring
+#        - name: ceph-bootstrap-mds-keyring
+#          secret:
+#            secretName: ceph-bootstrap-mds-keyring
+#        - name: ceph-bootstrap-rgw-keyring
+#          secret:
+#            secretName: ceph-bootstrap-rgw-keyring
+#        - name: ceph-bootstrap-rbd-keyring
+#          secret:
+#            secretName: ceph-bootstrap-rbd-keyring
       containers:
         - name: ceph-mgr
-          image: ceph/daemon:latest
-          imagePullPolicy: Always
+          image: ceph/daemon:luminous
+#          imagePullPolicy: Always
           ports:
             - containerPort: 6800
             - containerPort: 7000
@@ -73,25 +80,29 @@ spec:
             - name: CLUSTER
               value: ceph
           volumeMounts:
-            - name: ceph-conf
+            - name: etc-ceph
               mountPath: /etc/ceph
-            - name: ceph-bootstrap-osd-keyring
-              mountPath: /var/lib/ceph/bootstrap-osd
-            - name: ceph-bootstrap-mds-keyring
-              mountPath: /var/lib/ceph/bootstrap-mds
-            - name: ceph-bootstrap-rgw-keyring
-              mountPath: /var/lib/ceph/bootstrap-rgw
-            - name: ceph-bootstrap-rbd-keyring
-              mountPath: /var/lib/ceph/bootstrap-rbd
-          livenessProbe:
-              tcpSocket:
-                port: 6800
-              initialDelaySeconds: 60
-              timeoutSeconds: 5
-          readinessProbe:
-              tcpSocket:
-                port: 6800
-              timeoutSeconds: 5
+            - name: var-lib-ceph
+              mountPath: /var/lib/ceph
+#            - name: ceph-conf
+#              mountPath: /etc/ceph
+#            - name: ceph-bootstrap-osd-keyring
+#              mountPath: /var/lib/ceph/bootstrap-osd
+#            - name: ceph-bootstrap-mds-keyring
+#              mountPath: /var/lib/ceph/bootstrap-mds
+#            - name: ceph-bootstrap-rgw-keyring
+#              mountPath: /var/lib/ceph/bootstrap-rgw
+#            - name: ceph-bootstrap-rbd-keyring
+#              mountPath: /var/lib/ceph/bootstrap-rbd
+#          livenessProbe:
+#              tcpSocket:
+#                port: 6800
+#              initialDelaySeconds: 60
+#              timeoutSeconds: 5
+#          readinessProbe:
+#              tcpSocket:
+#                port: 6800
+#              timeoutSeconds: 5
           resources:
             requests:
               memory: "50Mi"

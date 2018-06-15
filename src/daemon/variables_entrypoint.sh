@@ -12,7 +12,8 @@ ALL_SCENARIOS="populate_kvstore mon osd osd_directory osd_directory_single osd_c
 # LIST OF ALL VARIABLES #
 #########################
 
-HOSTNAME=$(uname -n | cut -d'.' -f1)
+# HOSTNAME=$(uname -n | cut -d'.' -f1)
+HOSTNAME=srvubucep001
 : "${MON_NAME:=${HOSTNAME}}"
 : "${RGW_NAME:=${HOSTNAME}}"
 : "${RBD_MIRROR_NAME:=${HOSTNAME}}"
@@ -81,7 +82,8 @@ CRUSH_LOCATION_DEFAULT=("root=default" "host=${HOSTNAME}")
 CLI_OPTS=(--cluster ${CLUSTER})
 
 # This is ONLY used for the daemon's startup, e.g: ceph-osd $DAEMON_OPTS
-DAEMON_OPTS=(--cluster ${CLUSTER} --setuser ceph --setgroup ceph -d)
+DAEMON_OPTS=(--cluster ceph -d)
+# DAEMON_OPTS=(--cluster ${CLUSTER} --setuser ceph --setgroup ceph -d)
 
 MOUNT_OPTS=(-t xfs -o noatime,inode64)
 
